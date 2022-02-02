@@ -1,0 +1,100 @@
+---
+contentKey: chapter
+title: Step up - Firebase for chat app
+stepNo: 3
+metaTitle: Step up - Firebase for chat app
+metaDescription: Setting up Firebase for chat app
+date: 2022-01-23T09:45:22.941Z
+duration: 10 min
+color: "#6c4444"
+tags:
+  - flutter
+  - firebase
+keywords:
+  - flutter
+  - workshop
+  - firebase
+---
+## 🗄️ Step up - Firebase
+
+# Step 0 - Firebase Console
+
+[https://console.firebase.google.com/](https://console.firebase.google.com/project/flutterfirebasechat-622ea/overview)
+
+To create firebase project - `gdgflutterfirebasechat`
+
+![step 1 firebase console](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643202983/Codelab/flutter_02_chat_Firebase_console_gjvlov.png "step 1 firebase console")
+
+![](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643203142/Codelab/flutter_02_chat_Firebase_console_step2_lg7jdp.png)
+
+![](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643203243/Codelab/flutter_02_chat_Firebase_console_step3_zzwxio.png)
+
+## Create the app in firebase console
+
+![](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643203463/Codelab/flutter_02_chat_Firebase_console_add_app_01_jwfh5m.png)
+
+#### Rename application ID
+
+Make sure application Id matches the one you will use in firebase
+
+Rename application Id `com.example.devfest_flutter_firebase_chat` to **com.gdg.`devfest_flutter_firebase_chat`** 
+
+> Search for `com.example.devfest_flutter_firebase_chat`
+
+![](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643204067/Codelab/flutter_02_chat_Firebase_console_add_app_02_f5pyvh.png)
+
+### 📲 Configure iOS App
+
+![](https://lh5.googleusercontent.com/ch4QeXzcXOkA1wmmyy5-eQfxQaiYDZawj6cvDUyPjj2ci2G26s2Ru1fuBQntPbCIW1Gzjm9KPZFQs6ujTdeUVyQtlK0sgXar89Fw_Bqq3p0akCMgT-rFHJTbFi89nnukIRwj1nUY)
+
+![](https://lh4.googleusercontent.com/OXIVPqVUsTZxvQSCsAoNC1QN1leLpnUP4mtm6yzQsApDOR-JYM9lUzpPaGTpmamq6JRI1mAQi2YOu1ptH_0Gv3R5t67iPfKub7XkcHiM3vV2YR2hANAp551YJEZo4Dujg4ZMCUOu)
+
+![](https://lh4.googleusercontent.com/ahrXXrj4MCFc5FTFrWGYZ6iovavPpr_2Ycf4_Mt-TIITn9YkPqcEYhmhz-gXtaj9fhZmzzz5KTcOAMpNj_4CltGmjo79UifBHKvz2yBXALSXAUjpu-PdHf6Wy2_6bA-LBHdj9_Fc)
+
+Make sure copy items if needed is Checked 
+
+### 📲 Config android App
+
+![](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643204202/Codelab/flutter_02_chat_Firebase_console_add_app_03_lpjkap.png)
+
+![]()
+
+## Download the config file - `google-services.json`
+
+![google-services.json](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643204297/Codelab/flutter_02_chat_Firebase_console_add_app_04_ex1oad.png "google-services.json")
+
+![](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643204556/Codelab/flutter_02_chat_Firebase_console_add_google_services_05_azsoba.png)
+
+###    Add firebase sdk to project
+
+###### update classpath `build.gradle`
+
+    classpath 'com.google.gms:google-services:4.3.10'
+
+![](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643205121/Codelab/flutter_02_chat_Firebase_console_add_google_services_06_efsaxn.png)
+
+### Update Project-level build.gradle
+
+![](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643205251/Codelab/flutter_02_chat_Firebase_console_add_google_services_07_vfa2rn.png)
+
+### update App-level build.gradle
+
+
+
+![](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643207025/Codelab/flutter_02_chat_Firebase_console_add_google_services_08_ctsijy.png)
+
+update dependency - not an important step
+
+![](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643207150/Codelab/flutter_02_chat_Firebase_console_add_google_services_09_vofd6i.png)
+
+# Update 🗄️ pubspec.yaml 📄 file
+
+Add reference to these package 🗃️
+
+```yaml
+  cloud_firestore: ^3.1.6 
+  firebase_auth: ^3.3.5
+  firebase_core: ^1.11.0
+  firebase_messaging: ^11.2.5
+  firebase_storage: ^10.2.5
+```

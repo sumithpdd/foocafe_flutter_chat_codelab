@@ -1,0 +1,557 @@
+---
+contentKey: chapter
+title: Attendees Screen
+stepNo: 6
+metaTitle: Attendees Screen page
+metaDescription: Attendees Screen description
+date: 2022-01-25T21:11:31.867Z
+duration: 30 min
+tags:
+  - flutter
+  - firebase
+keywords:
+  - flutter
+  - firebase
+---
+# 🧑‍🤝‍🧑 Attendees Screen
+
+Now we have the chat screen working , user can also login , lets have some attendees and after the user logs in we we will redirect to `attendees_screen`, => and attendees can chat among themselves.
+
+First create database_service to call firestore database and retrieve users Create a new 📄 file under **services** 📁 folder  => database_service.dart 📄 file , The attendees are all the users they have registered. We update our database service and create a new function to get all users.
+
+```
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:devfest_flutter_firebase_chat/helpers/constants.dart';
+import 'package:devfest_flutter_firebase_chat/models/app_user.dart';
+
+class DatabaseService {
+  Future<AppUser> getUser(String userId) async {
+    DocumentSnapshot userDoc = await usersRef.doc(userId).get();
+    return AppUser.fromDoc(userDoc);
+  }
+
+  Future<List<AppUser>> searchUsers(String currentUserId, String name) async {
+    QuerySnapshot usersSnap =
+        await usersRef.where('name', isGreaterThanOrEqualTo: name).get();
+    List<AppUser> users = [];
+    for (var doc in usersSnap.docs) {
+      AppUser user = AppUser.fromDoc(doc);
+      if (user.id != currentUserId) {
+        users.add(user);
+      }
+    }
+    return users;
+  }
+
+  Future<List<AppUser>> getAllUsers(String currentUserId) async {
+    QuerySnapshot userSnapshot = await usersRef.get();
+    List<AppUser> users = [];
+    for (var doc in userSnapshot.docs) {
+      AppUser user = AppUser.fromDoc(doc);
+      if (user.id != currentUserId) users.add(user);
+    }
+    return users;
+  }
+}
+```
+
+### Model to Store Current User data
+
+To store current user data we will create a model -> user_data.dart under models 📁 folder it extends ChangeNotifierProvider
+
+```
+import 'package:flutter/material.dart';
+
+class UserData extends ChangeNotifier {
+  String? currentUserId;
+}
+```
+
+We will use provider to maintain state within app. We use to pass data between screens, for that we will use provider package A mixture between dependency injection (DI) and state management, built with widgets for widgets.
+
+update pubspec.yaml 
+
+```
+  provider: ^6.0.2
+```
+
+update main.dart main()
+
+```
+runApp(
+    MultiProvider(
+      providers: [
+         ChangeNotifierProvider(
+          create: (_) => UserData(),
+        ),
+        Provider<AuthService>(
+          create: (_) => AuthService(),
+        ),
+        Provider<DatabaseService>(
+          create: (_) => DatabaseService(),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
+```
+
+modify home and add routes for navigation
+
+```
+home: _getScreenId(),
+      routes: {
+        LoginScreen.id: (context) => const LoginScreen(),
+        AttendeesScreen.id: (context) => const AttendeesScreen(),
+      },
+```
+
+We got all our references now we need to navigate from main to attendees screen if we are logged in. update function _getScreenId() in  main.dart
+
+```
+Widget _getScreenId() {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (BuildContext context, snapshot) {
+        if (snapshot.hasData) {
+          Provider.of<UserData>(context).currentUserId = snapshot.data!.uid;
+          return const AttendeesScreen();
+        } else {
+          return LoginScreen();
+        }
+      },
+    );
+  }
+```
+
+a new 📄 file under `screens` 📁 folder  => **attendees_screen.dart ,** We can see the attendees screen with a list of attendees.
+
+```
+import 'package:devfest_flutter_firebase_chat/helpers/app_constants.dart';
+import 'package:flutter/material.dart';
+import 'package:devfest_flutter_firebase_chat/models/app_user.dart';
+import 'package:devfest_flutter_firebase_chat/models/user_data.dart';
+import 'package:devfest_flutter_firebase_chat/services/auth_service.dart';
+import 'package:devfest_flutter_firebase_chat/services/database_service.dart';
+import 'package:provider/provider.dart';
+
+import 'chat_screen.dart';
+
+class AttendeesScreen extends StatefulWidget {
+  static const String id = 'attendees_screen';
+
+  const AttendeesScreen({Key? key}) : super(key: key);
+
+  @override
+  _AttendeesScreenState createState() => _AttendeesScreenState();
+}
+
+class _AttendeesScreenState extends State<AttendeesScreen> {
+  List<AppUser> _users = [];
+  @override
+  void initState() {
+    super.initState();
+    _setupAttendees();
+  }
+
+  _setupAttendees() async {
+    String currentUserId =
+        Provider.of<UserData>(context, listen: false).currentUserId!;
+    List<AppUser> users =
+        await Provider.of<DatabaseService>(context, listen: false)
+            .getAllUsers(currentUserId);
+    if (mounted) {
+      setState(() {
+        _users = users;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor,
+      appBar: AppBar(
+        backgroundColor:
+            AppConstants.hexToColor(AppConstants.APP_PRIMARY_COLOR),
+        title: const Text(
+          'Attendees',
+          style: TextStyle(
+            fontSize: 28.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        elevation: 0.0,
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.exit_to_app),
+            onPressed: Provider.of<AuthService>(context, listen: false).logout,
+          ),
+        ],
+      ),
+      body: Column(
+        children: <Widget>[
+          AllAttendees(appUsers: _users),
+        ],
+      ),
+    );
+  }
+}
+
+class AllAttendees extends StatelessWidget {
+  final List<AppUser> appUsers;
+
+  const AllAttendees({required this.appUsers, Key? key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    String? currentUserId =
+        Provider.of<UserData>(context, listen: false).currentUserId;
+
+    return Expanded(
+      child: Container(
+        decoration: BoxDecoration(
+          color:
+              AppConstants.hexToColor(AppConstants.APP_BACKGROUND_COLOR_WHITE),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView.builder(
+            itemCount: appUsers.length,
+            itemBuilder: (BuildContext context, int index) {
+              final AppUser user = appUsers[index];
+              return GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChatScreen(
+                        // currentUserId: currentUserId!,
+                        // toUser: user,
+                        ),
+                  ),
+                ),
+                child: Container(
+                  margin:
+                      const EdgeInsets.only(top: 5.0, bottom: 5.0, right: 5.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0, vertical: 10.0),
+                  decoration: BoxDecoration(
+                    color: AppConstants.hexToColor(
+                        AppConstants.APP_PRIMARY_TILE_COLOR),
+                    borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          const SizedBox(width: 10.0),
+                          Center(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  user.name!,
+                                  style: TextStyle(
+                                    color: AppConstants.hexToColor(AppConstants
+                                        .APP_PRIMARY_FONT_COLOR_WHITE),
+                                    fontSize: 15.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 5.0),
+                                Text(
+                                  user.bio!,
+                                  style: const TextStyle(
+                                    fontSize: 12.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+![](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643232802/Codelab/flutter_06_attendees_screen_h9smua.png)
+
+### Introduction to widget - separation of concern
+
+Create a 📁 folder for ‘widgets’ => add 📄 file all_attendees_widget.dart
+
+```
+import 'package:devfest_flutter_firebase_chat/helpers/app_constants.dart';
+import 'package:devfest_flutter_firebase_chat/models/app_user.dart';
+import 'package:devfest_flutter_firebase_chat/models/user_data.dart';
+import 'package:devfest_flutter_firebase_chat/screens/chat_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+class AllAttendees extends StatelessWidget {
+  final List<AppUser> appUsers;
+
+  const AllAttendees({required this.appUsers, Key? key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    String? currentUserId =
+        Provider.of<UserData>(context, listen: false).currentUserId;
+
+    return Expanded(
+      child: Container(
+        decoration: BoxDecoration(
+          color:
+              AppConstants.hexToColor(AppConstants.APP_BACKGROUND_COLOR_WHITE),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView.builder(
+            itemCount: appUsers.length,
+            itemBuilder: (BuildContext context, int index) {
+              final AppUser user = appUsers[index];
+              return GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChatScreen(
+                        // currentUserId: currentUserId!,
+                        // toUser: user,
+                        ),
+                  ),
+                ),
+                child: Container(
+                  margin:
+                      const EdgeInsets.only(top: 5.0, bottom: 5.0, right: 5.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0, vertical: 10.0),
+                  decoration: BoxDecoration(
+                    color: AppConstants.hexToColor(
+                        AppConstants.APP_PRIMARY_TILE_COLOR),
+                    borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          const SizedBox(width: 10.0),
+                          Center(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  user.name!,
+                                  style: TextStyle(
+                                    color: AppConstants.hexToColor(AppConstants
+                                        .APP_PRIMARY_FONT_COLOR_WHITE),
+                                    fontSize: 15.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 5.0),
+                                Text(
+                                  user.bio!,
+                                  style: const TextStyle(
+                                    fontSize: 12.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+> and update attendees_screen.dart to use this widget
+
+# User profile images
+
+Profile images will come from the network, We will use Flutter library to load and cache network images We are using cached_network_image ,add to pubspec.yaml and get the package..
+
+> `cached_network_image: ^3.2.0`
+
+Lets first add a common App drawer
+
+under widget folder create a new file app_drawer_widget.dart
+
+```
+import 'package:flutter/material.dart';
+import 'package:devfest_flutter_firebase_chat/helpers/app_constants.dart';
+import 'package:devfest_flutter_firebase_chat/models/app_user.dart';
+import 'package:devfest_flutter_firebase_chat/models/user_data.dart';
+import 'package:devfest_flutter_firebase_chat/services/database_service.dart';
+import 'package:provider/provider.dart';
+
+class AppDrawer extends StatefulWidget {
+  const AppDrawer({Key? key}) : super(key: key);
+
+  @override
+  _AppDrawerState createState() => _AppDrawerState();
+}
+
+class _AppDrawerState extends State<AppDrawer> {
+  _buildActivity(BuildContext context, String userId) {
+    return FutureBuilder(
+        future:
+            Provider.of<DatabaseService>(context, listen: true).getUser(userId),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (!snapshot.hasData) {
+            return const SizedBox.shrink();
+          }
+          AppUser user = snapshot.data;
+          return DrawerHeader(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                // profileImage(user, avatarRadius: 50),
+                Text(
+                  user.name!,
+                  style: const TextStyle(
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  user.bio!,
+                  style: const TextStyle(
+                    fontSize: 20.0,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  tooltip: 'Edit Profile',
+                  onPressed: () {},
+                  // onPressed: () => Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (_) => EditProfileScreen(
+                  //       user: user,
+                  //     ),
+                  //   ),
+                  // ),
+                  color:
+                      AppConstants.hexToColor(AppConstants.APP_PRIMARY_COLOR),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String? currentUserId = Provider.of<UserData>(context).currentUserId;
+    return Drawer(
+      child: Column(children: [
+        Expanded(
+          flex: 1,
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.85,
+            child: currentUserId!.isNotEmpty
+                ? _buildActivity(context, currentUserId)
+                : const SizedBox.shrink(),
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: ListView(children: [
+            ListTile(
+              leading: Icon(
+                Icons.home,
+                color: AppConstants.hexToColor(AppConstants.APP_PRIMARY_COLOR),
+              ),
+              title: const Text('Home'),
+              onTap: () {},
+            ),
+            const Divider(),
+            ListTile(
+              leading: Icon(
+                Icons.people,
+                color: AppConstants.hexToColor(AppConstants.APP_PRIMARY_COLOR),
+              ),
+              title: const Text('Attendants'),
+              onTap: () {},
+            ),
+            const Spacer(flex: 8),
+          ]),
+        ),
+      ]),
+    );
+  }
+}
+
+```
+
+update attendees_screen.dart file to include the new appdrawer 
+
+```
+return Scaffold(
+      drawer: const AppDrawer(),
+```
+
+![](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643272478/Codelab/flutter_05_khor4p.png)
+
+Lets add functionality to update and Edit Profile Image
+
+Create a new widget user_profile_image.dart file under widgets folder
+
+```
+import 'package:devfest_flutter_firebase_chat/helpers/app_constants.dart';
+import 'package:devfest_flutter_firebase_chat/models/app_user.dart';
+import 'package:flutter/material.dart';
+
+Widget profileImage(AppUser user, {double avatarRadius = 25}) {
+  // No new profile image
+  if (user.profileImageUrl!.isEmpty) {
+    // Display placeholder
+    return CircleAvatar(
+      radius: avatarRadius,
+      backgroundImage: const AssetImage('assets/images/user_placeholder.jpg'),
+      backgroundColor:
+          AppConstants.hexToColor(AppConstants.APP_PRIMARY_COLOR_ACTION),
+    );
+  } else {
+    // User profile image exists
+    return CircleAvatar(
+      radius: avatarRadius,
+      backgroundImage: NetworkImage(user.profileImageUrl!),
+      backgroundColor: Colors.transparent,
+    );
+  }
+}
+
+```
+
+place the image before the name in the drawer app_drawer_widget.dart 
+
+```
+ children: <Widget>[
+                profileImage(user, avatarRadius: 35),
+                Text(
+                  user.name!,
+```
+
+Finally add a new screen to edit user profile and upload/edit profile image
+
+for that first we need a service to upload image to **firebase storage** see next section =>
