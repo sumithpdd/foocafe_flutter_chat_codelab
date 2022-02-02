@@ -21,8 +21,8 @@ First create database_service to call firestore database and retrieve users Crea
 
 ```
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:devfest_flutter_firebase_chat/helpers/constants.dart';
-import 'package:devfest_flutter_firebase_chat/models/app_user.dart';
+import 'package:foocafe_flutter_firebase_chat/helpers/constants.dart';
+import 'package:foocafe_flutter_firebase_chat/models/app_user.dart';
 
 class DatabaseService {
   Future<AppUser> getUser(String userId) async {
@@ -127,12 +127,12 @@ Widget _getScreenId() {
 a new 📄 file under `screens` 📁 folder  => **attendees_screen.dart ,** We can see the attendees screen with a list of attendees.
 
 ```
-import 'package:devfest_flutter_firebase_chat/helpers/app_constants.dart';
+import 'package:foocafe_flutter_firebase_chat/helpers/app_constants.dart';
 import 'package:flutter/material.dart';
-import 'package:devfest_flutter_firebase_chat/models/app_user.dart';
-import 'package:devfest_flutter_firebase_chat/models/user_data.dart';
-import 'package:devfest_flutter_firebase_chat/services/auth_service.dart';
-import 'package:devfest_flutter_firebase_chat/services/database_service.dart';
+import 'package:foocafe_flutter_firebase_chat/models/app_user.dart';
+import 'package:foocafe_flutter_firebase_chat/models/user_data.dart';
+import 'package:foocafe_flutter_firebase_chat/services/auth_service.dart';
+import 'package:foocafe_flutter_firebase_chat/services/database_service.dart';
 import 'package:provider/provider.dart';
 
 import 'chat_screen.dart';
@@ -290,10 +290,10 @@ class AllAttendees extends StatelessWidget {
 Create a 📁 folder for ‘widgets’ => add 📄 file all_attendees_widget.dart
 
 ```
-import 'package:devfest_flutter_firebase_chat/helpers/app_constants.dart';
-import 'package:devfest_flutter_firebase_chat/models/app_user.dart';
-import 'package:devfest_flutter_firebase_chat/models/user_data.dart';
-import 'package:devfest_flutter_firebase_chat/screens/chat_screen.dart';
+import 'package:foocafe_flutter_firebase_chat/helpers/app_constants.dart';
+import 'package:foocafe_flutter_firebase_chat/models/app_user.dart';
+import 'package:foocafe_flutter_firebase_chat/models/user_data.dart';
+import 'package:foocafe_flutter_firebase_chat/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -396,10 +396,10 @@ under widget folder create a new file app_drawer_widget.dart
 
 ```
 import 'package:flutter/material.dart';
-import 'package:devfest_flutter_firebase_chat/helpers/app_constants.dart';
-import 'package:devfest_flutter_firebase_chat/models/app_user.dart';
-import 'package:devfest_flutter_firebase_chat/models/user_data.dart';
-import 'package:devfest_flutter_firebase_chat/services/database_service.dart';
+import 'package:foocafe_flutter_firebase_chat/helpers/app_constants.dart';
+import 'package:foocafe_flutter_firebase_chat/models/app_user.dart';
+import 'package:foocafe_flutter_firebase_chat/models/user_data.dart';
+import 'package:foocafe_flutter_firebase_chat/services/database_service.dart';
 import 'package:provider/provider.dart';
 
 class AppDrawer extends StatefulWidget {
@@ -517,8 +517,8 @@ Lets add functionality to update and Edit Profile Image
 Create a new widget user_profile_image.dart file under widgets folder
 
 ```
-import 'package:devfest_flutter_firebase_chat/helpers/app_constants.dart';
-import 'package:devfest_flutter_firebase_chat/models/app_user.dart';
+import 'package:foocafe_flutter_firebase_chat/helpers/app_constants.dart';
+import 'package:foocafe_flutter_firebase_chat/models/app_user.dart';
 import 'package:flutter/material.dart';
 
 Widget profileImage(AppUser user, {double avatarRadius = 25}) {

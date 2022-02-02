@@ -40,7 +40,7 @@ const config = {
       "<a href='https://developers.google.com/community/gdg'>Flutter Chat app codelab</a><div class='greenCircle'></div>",
   },
   siteMetadata: {
-    title: 'Flutter Chat app codelab | Sumith Damodaran',
+    title: 'Flutter Chat App Codelab | Sumith Damodaran',
     description: 'Documentation built with mdx.',
     ogImage: null,
     docsLocation: 'https://github.com/sumithpdd/foocafe_flutter_chat_codelab',
@@ -49,7 +49,7 @@ const config = {
   pwa: {
     enabled: false, // disabling this will also remove the existing service worker.
     manifest: {
-      name: 'Flutter Chat app codelab',
+      name: 'Flutter Chat App Codelab',
       short_name: 'FlutterChatAppCodelab',
       start_url: '/',
       background_color: '#6b37bf',
