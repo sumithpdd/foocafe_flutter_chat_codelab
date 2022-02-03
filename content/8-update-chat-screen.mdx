@@ -124,9 +124,7 @@ That **`chat_screen.dart`** will need to take 2 parameters, from which user mess
 
 ```
   final String? currentUserId;
-
   final String? toUserId;
-
   const ChatScreen({this.currentUserId, this.toUserId, Key? key})
       : super(key: key);
 ```
@@ -142,6 +140,9 @@ final List<Message> _messages = messages;
 `And add`
 
 ```
+  late DatabaseService _dataBaseService;
+  List<Message> _messages = [];
+  
   @override
   void initState() {
     super.initState();
@@ -161,53 +162,35 @@ final List<Message> _messages = messages;
 Update message time with
 
 ```
-  Text(
-
-                 '${timeFormat.format(message.timestamp.toDate())}',
+Text(
+    timeFormat.format(message.timestamp!.toDate()),
 ```
 
 In the  `void _handleSubmitted(String` , update code to pass new values and call the database service
 
 ```
-void _handleSubmitted(String text) {
+  void _handleSubmitted(String text) {
+    _textMessageController.clear();
 
-   _textMessageController.clear();
+    setState(() {
+      _isComposing = false;
+    });
 
- 
+    Message message = Message(
+      senderId: widget.currentUserId,
+      toUserId: widget.toUserId,
+      timestamp: Timestamp.fromDate(DateTime.now()),
+      text: text,
+      isLiked: true,
+      unread: true,
+    );
 
-   setState(() {
+    setState(() {
+      _messages.insert(0, message);
+    });
 
-     _isComposing = false;
-
-   });
-
-   Message message = Message(
-
-     senderId: widget.currentUserId,
-
-     toUserId: widget.toUserId,
-
-     timestamp: Timestamp.fromDate(DateTime.now()),
-
-     text: text,
-
-     isLiked: true,
-
-     unread: true,
-
-   );
-
-   setState(() {
-
-     _messages.insert(0, message);
-
-   });
-
-       _dataBaseService.sendChatMessage(message);
-
- 
-
- }
+    _dataBaseService.sendChatMessage(message);
+  }
 ```
 
 And finally update the `isMe`code to get value from the widget
