@@ -15,101 +15,57 @@ keywords:
 ---
 # 🗣️ Update Chat Screen
 
-
-
-Now let's finish the Chat application and saveapplication save the chat message to database.
+Now let's finish the Chat application and save the chat message to database.
 
 #### DataBase Service
 
-We update our DataBaseService to getChatMessages and sendChatMessage
+We update our DataBaseService => **`database_service.dart`** to getChatMessages and sendChatMessage
 
 ```
-Future<List<Message>> getChatMessages(
+ Future<List<Message>> getChatMessages(
+      String senderId, String receiverId) async {
+    List<Message> messages = [];
+    QuerySnapshot messagesSenderQuerySnapshot = await chatsRef
+        .where('senderId', isEqualTo: senderId)
+        .where('toUserId', isEqualTo: receiverId)
+        .orderBy('timestamp', descending: true)
+        .get();
 
-     String senderId, String receiverId) async {
+    for (var doc in messagesSenderQuerySnapshot.docs) {
+      // ignore: avoid_print
+      print(doc.id);
+      messages.add(Message.fromDoc(doc));
+    }
+    QuerySnapshot messagestoQuerySnapshot = await chatsRef
+        .where('senderId', isEqualTo: receiverId)
+        .where('toUserId', isEqualTo: senderId)
+        .orderBy('timestamp', descending: true)
+        .get();
 
-      
+    for (var doc in messagestoQuerySnapshot.docs) {
+      // ignore: avoid_print
+      print(doc.id);
+      messages.add(Message.fromDoc(doc));
+    }
 
-   List<Message> messages = \[];
+    Comparator<Message> timestampComparator =
+        (a, b) => b.timestamp!.compareTo(a.timestamp!);
+    messages.sort(timestampComparator);
+    return messages;
+  }
 
-   QuerySnapshot messagesSenderQuerySnapshot = await chatsRef
-
-       .where('senderId', isEqualTo: senderId)
-
-       .where('toUserId', isEqualTo: receiverId)
-
-       .orderBy('timestamp', descending: true)
-
-       .getDocuments();
-
- 
-
-   messagesSenderQuerySnapshot.documents.forEach((doc) {
-
-     print(doc.documentID);
-
-     messages.add(Message.fromDoc(doc));
-
-   });
-
-   QuerySnapshot messagestoQuerySnapshot = await chatsRef
-
-       .where('senderId', isEqualTo: receiverId)
-
-       .where('toUserId', isEqualTo: senderId)
-
-       .orderBy('timestamp', descending: true)
-
-       .getDocuments();
-
- 
-
-   messagestoQuerySnapshot.documents.forEach((doc) {
-
-     print(doc.documentID);
-
-     messages.add(Message.fromDoc(doc));
-
-   });
-
- 
-
-   Comparator<Message> timestampComparator =
-
-       (a, b) => b.timestamp.compareTo(a.timestamp);
-
-   messages.sort(timestampComparator);
-
-   return messages;
-
- }
-
- 
-
- void sendChatMessage(Message message) {
-
-   chatsRef.add({
-
-     'senderId': message.senderId,
-
-     'toUserId': message.toUserId,
-
-     'text': message.text,
-
-     'imageUrl': message.imageUrl,
-
-     'isLiked': message.isLiked,
-
-     'unread': message.unread,
-
-     'timestamp': Timestamp.fromDate(DateTime.now()),
-
-   });
-
- }
+  void sendChatMessage(Message message) {
+    chatsRef.add({
+      'senderId': message.senderId,
+      'toUserId': message.toUserId,
+      'text': message.text,
+      'imageUrl': message.imageUrl,
+      'isLiked': message.isLiked,
+      'unread': message.unread,
+      'timestamp': Timestamp.fromDate(DateTime.now()),
+    });
+  }
 ```
-
-
 
 #### Update Message Model
 
@@ -175,23 +131,15 @@ class Message {
 }
 ```
 
-
-
-
-
 We will add dateFormat to our constants.dart 📄 file
 
 ```
 final DateFormat timeFormat =DateFormat('E, h:mm a');
 ```
 
-
-
 To get the dateformat import package - intl - pubspec.yaml
 
-> `  intl: ^0.16.1`
-
-
+> `intl: ^0.16.1`
 
 #### Refactor Chat Screen
 
@@ -207,8 +155,6 @@ final String currentUserId;
  ChatScreen({this.currentUserId, this.toUserId});
 ```
 
- 
-
 We need to bring messages from our database.
 
 `Delete`
@@ -216,10 +162,6 @@ We need to bring messages from our database.
 ```
  final List<Message> _messages = messages;
 ```
-
-
-
- 
 
 `And add`
 
@@ -261,8 +203,6 @@ DataBaseService _dataBaseService;
  }
 ```
 
-  
-
 Update message time with
 
 ```
@@ -270,12 +210,6 @@ Update message time with
 
                  '${timeFormat.format(message.timestamp.toDate())}',
 ```
-
-     
-
-      
-
-
 
 In the  `void _handleSubmitted(String` , update code to pass new values and call the database service
 
@@ -321,9 +255,7 @@ void _handleSubmitted(String text) {
  }
 ```
 
-And finally update the `isMe `code to get value from the widget
-
-                   
+And finally update the `isMe`code to get value from the widget
 
 ```
 final bool isMe = message.senderId == widget.currentUserId;
@@ -344,8 +276,6 @@ Widget build(BuildContext context) {
 
        Provider.of<UserData>(context, listen: false).currentUserId;
 ```
-
-
 
 And pass it to the chatscreen
 
@@ -371,13 +301,7 @@ return GestureDetector(
                ),
 ```
 
-
-
-
-
 ![](https://lh4.googleusercontent.com/KrQ0Q44DBwIwR9TI3vDFWrZ8dJwtNT3NVuaPbYh_JdNEi4iNMukWLCpTP8VS5kHfPEY5fTgzIYyWorlWbpL_g4sUGqkl6LGKjdvlxJBnVD-ZWhJwaiFgBg-jiHNPd2aForffvaQ7)
-
-
 
 ## Step 6 -Sending Picture Messages
 
@@ -409,8 +333,6 @@ Future<String> uploadMessageImage(File imageFile) async {
  }
 ```
 
- 
-
 In chat_screen.dart we update _buildMessage
 
 And check if message.imageurl == null and remove  Text(              message.text, …
@@ -426,8 +348,6 @@ And check if message.imageurl == null and remove  Text(              mes
 
            SizedBox(height: 8.0),
 ```
-
-    
 
 Add the new methods before build
 
@@ -576,8 +496,6 @@ onPressed: _isComposing
 
                : null,
 ```
-
-           
 
 Finally add Provider for StorageService in main.dart
 
