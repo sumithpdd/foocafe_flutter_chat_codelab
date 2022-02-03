@@ -311,80 +311,49 @@ RawMaterialButton(
             child: Icon(
 ```
 
-Update _handleSubmitted to take additional parameter
+Update **_handleSubmitted** to take additional parameter
 
 ```
-void _handleSubmitted(String text, String imageUrl) {
+void _handleSubmitted(String? text, String? imageUrl) {
+    if ((text != null && text.trim().isNotEmpty) || imageUrl != null) {
+      if (imageUrl == null) {
+        //text message
 
-   if ((text != null && text.trim().isNotEmpty) || imageUrl != null) {
-
-     if (imageUrl == null) {
-
-       //text message
-
- 
-
-       setState(() {
-
-         _isComposing = false;
-
-       });
-
-     }
-
-     Message message = Message(
-
-       senderId: widget.currentUserId,
-
-       toUserId: widget.toUserId,
-
-       imageUrl: imageUrl,
-
-       timestamp: Timestamp.fromDate(DateTime.now()),
-
-       text: text,
-
-       isLiked: true,
-
-       unread: true,
-
-     );
-
-     setState(() {
-
-       _messages.insert(0, message);
-
-     });
-
-     _dataBaseService.sendChatMessage(message);
-
-   }
-
- }
+        setState(() {
+          _isComposing = false;
+        });
+      }
+      Message message = Message(
+        senderId: widget.currentUserId,
+        toUserId: widget.toUserId,
+        imageUrl: imageUrl,
+        timestamp: Timestamp.fromDate(DateTime.now()),
+        text: text,
+        isLiked: true,
+        unread: true,
+      );
+      setState(() {
+        _messages.insert(0, message);
+      });
+      _dataBaseService.sendChatMessage(message);
+    }
+  }
 ```
 
  And update its usages.
 
 ```
 onPressed: _isComposing
-
-               ? () => _handleSubmitted(
-
-                     _textMessageController.text,
-
-                     null,
-
-                   )
-
-               : null,
+                ? () => _handleSubmitted(_textMessageController.text, null)
+                : null,
 ```
 
-Finally add Provider for StorageService in main.dart
+Finally add Provider for **StorageService** in `main.dart`
 
 ```
 Provider<StorageService>(
-
-     create: (_) => StorageService(),
-
-   ),
+          create: (_) => StorageService(),
+        ),
 ```
+
+![](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643891061/foocafe_flutter_chat_codelab/08_02_sending_message_withimages_mqi10w.png)
