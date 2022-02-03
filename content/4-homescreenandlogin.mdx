@@ -27,7 +27,6 @@ We create or use  📁 Folder = > **services** -> File -> auth_service.dart
 `we are adding FirebaseMessaging for token reference, not an important step`
 
 ```dart
-import 'package:foocafe_flutter_firebase_chat/helpers/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
@@ -64,6 +63,7 @@ class AuthService {
     ]);
   }
 }
+
 ```
 
 This user should also be stored in a database, so that we can use it in chat.
@@ -402,7 +402,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-
 ```
 
 ### Update Main.dart
@@ -415,7 +414,7 @@ void main() async {
   await Firebase.initializeApp();
 ```
 
-Delete class `MyHomePage `and direct home to the new `LoginScreen`
+Delete class `MyHomePage`and direct home to the new `LoginScreen`
 
 ```
 home: const LoginScreen(),
