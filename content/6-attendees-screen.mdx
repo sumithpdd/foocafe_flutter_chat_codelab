@@ -106,7 +106,9 @@ home: _getScreenId(),
       },
 ```
 
-We got all our references now we need to navigate from main to attendees screen if we are logged in. update function _getScreenId() in  main.dart
+This will give an error, we will create the files in the next steps.
+
+We got all our references now we need to navigate from main to attendees screen if we are logged in. update function **_getScreenId()** in  **main.dart**
 
 ```
 Widget _getScreenId() {
@@ -283,11 +285,11 @@ class AllAttendees extends StatelessWidget {
 }
 ```
 
-![](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643232802/Codelab/flutter_06_attendees_screen_h9smua.png)
+![](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643884510/foocafe_flutter_chat_codelab/06_01_attendees_screen_zgavhc.png)
 
 ### Introduction to widget - separation of concern
 
-Create a 📁 folder for ‘widgets’ => add 📄 file all_attendees_widget.dart
+Create a 📁 folder for ‘**`widgets`**’ => add 📄 file **`all_attendees_widget.dart`**
 
 ```
 import 'package:foocafe_flutter_firebase_chat/helpers/app_constants.dart';
@@ -382,7 +384,15 @@ class AllAttendees extends StatelessWidget {
 }
 ```
 
-> and update attendees_screen.dart to use this widget
+> and update **attendees_screen.dart** to use this widget
+>
+> ```
+> body: Column(
+>         children: <Widget>[
+>           AllAttendees(appUsers: _users),
+>         ],
+>       ),
+> ```
 
 # User profile images
 
@@ -390,9 +400,9 @@ Profile images will come from the network, We will use Flutter library to load a
 
 > `cached_network_image: ^3.2.0`
 
-Lets first add a common App drawer
+Lets first add a common **App drawer**
 
-under widget folder create a new file app_drawer_widget.dart
+Under widget folder create a new file `app_drawer_widget.dart`
 
 ```
 import 'package:flutter/material.dart';
@@ -502,18 +512,18 @@ class _AppDrawerState extends State<AppDrawer> {
 }
 ```
 
-update attendees_screen.dart file to include the new appdrawer 
+update **`attendees_screen.dart`** file to include the new appdrawer 
 
 ```
 return Scaffold(
       drawer: const AppDrawer(),
 ```
 
-![](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643272478/Codelab/flutter_05_khor4p.png)
+![](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643884790/foocafe_flutter_chat_codelab/06__02_appdrawer_hfpc5h.png)
 
 Lets add functionality to update and Edit Profile Image
 
-Create a new widget user_profile_image.dart file under widgets folder
+Create a new widget **`user_profile_image.dart`** file under **widgets** folder
 
 ```
 import 'package:foocafe_flutter_firebase_chat/helpers/app_constants.dart';
@@ -541,7 +551,7 @@ Widget profileImage(AppUser user, {double avatarRadius = 25}) {
 }
 ```
 
-place the image before the name in the drawer app_drawer_widget.dart 
+Place the image before the name in the drawer **`app_drawer_widget.dart` ,** and **import** the file
 
 ```
  children: <Widget>[
@@ -550,6 +560,6 @@ place the image before the name in the drawer app_drawer_widget.dart
                   user.name!,
 ```
 
-Finally add a new screen to edit user profile and upload/edit profile image
+Finally we will add a new screen to edit user profile and upload/edit profile image
 
-for that first we need a service to upload image to **firebase storage** see next section =>
+For that first we need a service to upload image to **firebase storage** see next section =>
