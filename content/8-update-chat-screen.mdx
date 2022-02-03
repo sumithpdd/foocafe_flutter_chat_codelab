@@ -72,87 +72,63 @@ We update our DataBaseService => **`database_service.dart`** to getChatMessages 
 We need to  update our message model, and introduce from sender and to sender and new fields, also it will have a function that maps database values with object.
 
 ```
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Message {
+  final String? id, senderId, toUserId, text, imageUrl;
+  final bool? isLiked;
+  final bool? unread;
+ final Timestamp? timestamp;
 
-  final String id, senderId, toUserId, text, imageUrl;
+  Message({
+    this.id,
+    this.senderId,
+    this.toUserId,
+    this.text,
+    this.imageUrl,
+    this.isLiked,
+    this.unread,
+    this.timestamp,
+  });
 
-  final bool isLiked;
-
-  final bool unread;
-
-  final Timestamp timestamp;
-
- 
-
-  Message({
-
-    this.id,
-
-    this.senderId,
-
-    this.toUserId,
-
-    this.text,
-
-    this.imageUrl,
-
-    this.isLiked,
-
-    this.unread,
-
-    this.timestamp,
-
-  });
-
- 
-
-  factory Message.fromDoc(DocumentSnapshot doc) {
-
-    return Message(
-
-        id: doc.documentID,
-
-        senderId: doc\['senderId'],
-
-        toUserId: doc\['toUserId'],
-
-        text: doc\['text'],
-
-        imageUrl: doc\['imageUrl'],
-
-        isLiked: doc\['isLiked'],
-
-        unread: doc\['unread'],
-
-        timestamp: doc\['timestamp']);
-
-  }
-
+  factory Message.fromDoc(DocumentSnapshot doc) {
+    return Message(
+        id: doc.id,
+        senderId: doc['senderId'],
+        toUserId: doc['toUserId'],
+        text: doc['text'],
+        imageUrl: doc['imageUrl'],
+        isLiked: doc['isLiked'],
+        unread: doc['unread'],
+        timestamp: doc['timestamp']);
+  }
 }
+
 ```
 
 We will add dateFormat to our constants.dart 📄 file
-
-```
-final DateFormat timeFormat =DateFormat('E, h:mm a');
-```
 
 To get the dateformat import package - intl - pubspec.yaml
 
 > `intl: ^0.16.1`
 
+```
+final DateFormat timeFormat =DateFormat('E, h:mm a');
+```
+
+
+
 #### Refactor Chat Screen
 
-That chat_screen.dart will need to take 2 parameters, from which user message is coming from and to sender.
+That **`chat_screen.dart`** will need to take 2 parameters, from which user message is coming from and to sender.
 
 ```
-final String currentUserId;
+  final String? currentUserId;
 
- final String toUserId;
+  final String? toUserId;
 
- 
-
- ChatScreen({this.currentUserId, this.toUserId});
+  const ChatScreen({this.currentUserId, this.toUserId, Key? key})
+      : super(key: key);
 ```
 
 We need to bring messages from our database.
@@ -160,47 +136,26 @@ We need to bring messages from our database.
 `Delete`
 
 ```
- final List<Message> _messages = messages;
+final List<Message> _messages = messages;
 ```
 
 `And add`
 
 ```
-DataBaseService _dataBaseService;
+  @override
+  void initState() {
+    super.initState();
+    _dataBaseService = Provider.of<DatabaseService>(context, listen: false);
+    _setupMessages();
+  }
 
- List<Message> _messages = \[];
-
- 
-
- @override
-
- void initState() {
-
-   super.initState();
-
-     _dataBaseService = Provider.of<DataBaseService>(context, listen: false);
-
- 
-
-   _setupMessages();
-
- }
-
- 
-
- _setupMessages() async {
-
-   List<Message> messages = await _dataBaseService.getChatMessages(
-
-       widget.currentUserId, widget.toUserId);
-
-   setState(() {
-
-     _messages = messages;
-
-   });
-
- }
+  _setupMessages() async {
+    List<Message> messages = await _dataBaseService.getChatMessages(
+        widget.currentUserId!, widget.toUserId!);
+    setState(() {
+      _messages = messages;
+    });
+  }
 ```
 
 Update message time with
