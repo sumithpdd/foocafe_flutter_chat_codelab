@@ -54,7 +54,15 @@ defaultConfig {
 
 open *\[YourProject]/ios/Podfile* and remove the **\#** sign from `platform :ios, '9.0'` and try `flutter run`. If it doesn't work increase the version number for example to 11.0
 
+delete podfile.lock and run these commands
 
+```
+flutter clean
+cd ios
+pod deintegrate
+pod repo update
+pod install
+```
 
 ### Explain 
 
