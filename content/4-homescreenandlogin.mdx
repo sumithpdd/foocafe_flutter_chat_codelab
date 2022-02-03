@@ -83,7 +83,11 @@ final FirebaseStorage _storage = FirebaseStorage.instance;
 final storageRef = _storage.ref();
 ```
 
-go back and update `auth_service.dart` 📄 file
+go back and update `auth_service.dart` 📄 file and import 
+
+import 'package:foocafe_flutter_firebase_chat/helpers/constants.dart';
+
+
 
 ```dart
  if (authResult.user != null) {
@@ -130,7 +134,7 @@ class AppUser {
 }
 ```
 
-FYI : understand this piece of code
+FYI only : understand this piece of code
 
 ```dart
 ....
@@ -142,7 +146,7 @@ factory User.fromDoc(DocumentSnapshot doc)
 
 ## Check firebase Console
 
-Make sure database and authentication is set
+Make sure **database** and **authentication** is set
 
 ![](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643211130/Codelab/flutter_03_03_firebase_database_fgj16j.png)
 
@@ -283,31 +287,34 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 8.0, top: 30.0),
+            padding: const EdgeInsets.only(left: 8.0, top: 80.0),
             child: Card(
               semanticContainer: true,
               clipBehavior: Clip.antiAliasWithSaveLayer,
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      "assets/images/devfest_uki.gif",
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        " { devfest - 2021 - chat app }",
-                        style: TextStyle(
-                          backgroundColor: AppConstants.hexToColor(
-                              AppConstants.APP_PRIMARY_COLOR_BLACK),
-                          color: AppConstants.hexToColor(
-                              AppConstants.APP_PRIMARY_COLOR_LIGHT),
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        "assets/images/logo-withtext-color.png",
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          " { Foocafe Flutter Chat App }",
+                          style: TextStyle(
+                            backgroundColor: AppConstants.hexToColor(
+                                AppConstants.APP_PRIMARY_COLOR_BLACK),
+                            color: AppConstants.hexToColor(
+                                AppConstants.APP_PRIMARY_COLOR_LIGHT),
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                    ),
-                  ]),
+                    ]),
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0),
               ),
@@ -402,6 +409,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
 ```
 
 ### Update Main.dart
