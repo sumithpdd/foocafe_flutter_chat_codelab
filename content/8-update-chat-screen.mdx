@@ -69,7 +69,7 @@ We update our DataBaseService => **`database_service.dart`** to getChatMessages 
 
 #### Update Message Model
 
-We need to  update our message model, and introduce from sender and to sender and new fields, also it will have a function that maps database values with object.
+We need to  update our message model, and introduce from sender and to sender and new fields, also it will have a function that maps database values with object., this will break **dummydata** in **data.dart** , comment out the code in data.dart
 
 ```
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -228,102 +228,69 @@ return GestureDetector(
                 ),
 ```
 
-![](https://lh4.googleusercontent.com/KrQ0Q44DBwIwR9TI3vDFWrZ8dJwtNT3NVuaPbYh_JdNEi4iNMukWLCpTP8VS5kHfPEY5fTgzIYyWorlWbpL_g4sUGqkl6LGKjdvlxJBnVD-ZWhJwaiFgBg-jiHNPd2aForffvaQ7)
+![](https://res.cloudinary.com/sitecore/image/upload/c_limit,q_80,w_2000/v1643890295/foocafe_flutter_chat_codelab/08_01_sending_message_to_firebase_zcxuya.png)
 
 ## Step 6 -Sending Picture Messages
 
 We would also like to send pictures in the chat.
 
-In our storage_service.dart we will add a new function uploadMessageImage
+In our **`storage_service.dart`** we will add a new function uploadMessageImage
 
 ```
-Future<String> uploadMessageImage(File imageFile) async {
-
-   String imageId = Uuid().v4();
-
-   File image = await compressImage(imageId, imageFile);
-
- 
-
-   String downloadUrl = await _uploadImage(
-
-     'images/messages/message_$imageId.jpg',
-
-     imageId,
-
-     image,
-
-   );
-
-   return downloadUrl;
-
- }
+uture<String> uploadMessageImage(File imageFile) async {
+    String imageId = const Uuid().v4();
+    File? image = await _compressImage(imageId, imageFile);
+    String downloadUrl = await _uploadImage(
+      'images/messages/message_$imageId.jpg',
+      image!,
+    );
+    return downloadUrl;
+  }
 ```
 
-In chat_screen.dart we update _buildMessage
+In **`chat_screen.dart`** we update **_buildMessage function**
 
-And check if message.imageurl == null and remove  Text(              message.text, …
-
-```
-   children: <Widget>[
-
-           message.imageUrl == null
-
-               ? _buildText(isMe, message)
-
-               : _buildImage(context, message),
-
-           SizedBox(height: 8.0),
-```
-
-Add the new methods before build
+refactor the code and have function to hande each type of message, And check if message.imageurl == null and remove  Text(message.text, …
 
 ```
-_buildText(bool isMe,Message message) {
+Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            message.imageUrl == null
+                ? _buildText(isMe, message)
+                : _buildImage(context, message),
+            const SizedBox(height: 8.0),
+```
 
-   return Text(
+Add the new methods before **_buildMessageComposer**
 
-             message.text,
+```
+_buildText(bool isMe, Message message) {
+    return Text(
+      message.text!,
+      style: TextStyle(
+        color: isMe
+            ? AppConstants.hexToColor(AppConstants.APP_PRIMARY_COLOR_BLACK)
+            : AppConstants.hexToColor(AppConstants.APP_BACKGROUND_COLOR_GRAY),
+        fontSize: 15.0,
+        fontWeight: FontWeight.w600,
+      ),
+    );
+  }
 
-             style: TextStyle(
-
-               color: isMe ? Colors.white60 : Colors.blueGrey,
-
-               fontSize: 12.0,
-
-               fontWeight: FontWeight.w600,
-
-             ),
-
-           );
-
- }
-
-_buildImage(BuildContext context,Message message) {
-
-   final size = MediaQuery.of(context).size;
-
-   return Container(
-
-     height: size.height * 0.2,
-
-     width: size.width * 0.6,
-
-     decoration: BoxDecoration(
-
-         borderRadius: BorderRadius.circular(20.0),
-
-         image: DecorationImage(
-
-           fit: BoxFit.cover,
-
-           image: CachedNetworkImageProvider(message.imageUrl),
-
-         )),
-
-   );
-
- }
+  _buildImage(BuildContext context, Message message) {
+    final size = MediaQuery.of(context).size;
+    return Container(
+      height: size.height * 0.2,
+      width: size.width * 0.6,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20.0),
+          image: DecorationImage(
+            fit: BoxFit.cover,
+            image: CachedNetworkImageProvider(message.imageUrl!),
+          )),
+    );
+  }
 ```
 
 Add to onPressed of our camera icon
