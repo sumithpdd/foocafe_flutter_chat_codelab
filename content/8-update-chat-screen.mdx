@@ -296,31 +296,19 @@ _buildText(bool isMe, Message message) {
 Add to onPressed of our camera icon
 
 ```
-children: <Widget>[
-
-         RawMaterialButton(
-
-           onPressed: () async {
-
-             File imageFile = await ImagePicker.pickImage(
-
-               source: ImageSource.gallery,
-
-             );
-
-             if (imageFile != null) {
-
-               String imageUrl =
-
-                   await Provider.of<StorageService>(context, listen: false)
-
-                       .uploadMessageImage(imageFile);
-
-               _handleSubmitted(null, imageUrl);
-
-             }
-
-           },
+RawMaterialButton(
+            onPressed: () async {
+              XFile? imageFile = await ImagePicker().pickImage(
+                source: ImageSource.gallery,
+              );
+              if (imageFile != null) {
+                String imageUrl =
+                    await Provider.of<StorageService>(context, listen: false)
+                        .uploadMessageImage(File(imageFile.path));
+                _handleSubmitted(null, imageUrl);
+              }
+            },
+            child: Icon(
 ```
 
 Update _handleSubmitted to take additional parameter
