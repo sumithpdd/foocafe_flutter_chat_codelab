@@ -203,16 +203,14 @@ Chat screen is called through the attendees screen.
 
 #### Update all_attendees_widget
 
-So update the all_attendees_widget.dart
+So update the **`all_attendees_widget.dart`**
 
 In the build get the current user id
 
 ```
-Widget build(BuildContext context) {
-
-       String currentUserId =
-
-       Provider.of<UserData>(context, listen: false).currentUserId;
+  Widget build(BuildContext context) {
+    String currentUserId =
+        Provider.of<UserData>(context, listen: false).currentUserId!;
 ```
 
 And pass it to the chatscreen
