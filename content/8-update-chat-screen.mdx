@@ -217,24 +217,15 @@ And pass it to the chatscreen
 
 ```
 return GestureDetector(
-
-               onTap: () => Navigator.push(
-
-                 context,
-
-                 MaterialPageRoute(
-
-                   builder: (_) => ChatScreen(
-
-                     currentUserId: currentUserId,
-
-                     toUserId: user.id,
-
-                   ),
-
-                 ),
-
-               ),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChatScreen(
+                        currentUserId: currentUserId,
+                        toUserId: user.id,
+                        ),
+                  ),
+                ),
 ```
 
 ![](https://lh4.googleusercontent.com/KrQ0Q44DBwIwR9TI3vDFWrZ8dJwtNT3NVuaPbYh_JdNEi4iNMukWLCpTP8VS5kHfPEY5fTgzIYyWorlWbpL_g4sUGqkl6LGKjdvlxJBnVD-ZWhJwaiFgBg-jiHNPd2aForffvaQ7)
