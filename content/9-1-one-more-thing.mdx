@@ -15,56 +15,49 @@ keywords:
 ---
 # 🎁 One more thing
 
-
-
 On the chat window lets add who is sending message we will modify the app bar to include profile image and name
 
+modify chat_screen.dart to accept touser as a AppUser
+
 ```
-appBar: AppBar(
+class ChatScreen extends StatefulWidget {
+  final String? currentUserId;
+  final AppUser toUser;
 
-       title: Row(
-
-         children: <Widget>[
-
-           CircleAvatar(
-
-               radius: 25.0,
-
-               backgroundImage: widget.toUser.profileImageUrl.isEmpty
-
-                   ? // Display placeholder
-
-                   AssetImage('assets/images/user_placeholder.jpg')
-
-                   : CachedNetworkImageProvider(
-
-                       widget.toUser.profileImageUrl)),
-
-           SizedBox(width: 10.0),
-
-           Text(
-
-             widget.toUser.name,
-
-             style: TextStyle(
-
-               fontSize: 18.0,
-
-               fontWeight: FontWeight.bold,
-
-             ),
-
-           ),
-
-         ],
-
-       ),
-
-       elevation: 10.0,       
-
-     ),
+  const ChatScreen({this.currentUserId, required this.toUser, Key? key})
+      : super(key: key);
 ```
 
+Fix all the references
 
+Create a private function for appbar
+
+```
+AppBar _appbar() {
+    return AppBar(
+      title: Row(
+        children: <Widget>[
+          profileImage(widget.toUser, avatarRadius: 25),
+          SizedBox(width: 10.0),
+          Text(
+            widget.toUser.name!,
+            style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+      elevation: 10.0,
+    );
+  }
+```
+
+Update the build method to use the appbar
+
+```
+return Scaffold(
+      appBar: _appbar(),
+```
 
 ![](https://lh6.googleusercontent.com/oB28S8uSEJf0hr88dGwiiBx2vfT4EY4b7RaOr7PEZcUu29V5XQLSDxOfNtZBMh3sThbOJMfrOjFBO6F6XsuYqWPjIM6cPO_EO-RLKO_0k3kgTMUmMz9x3QIV2gHdDrfz1dr9OJu9)
